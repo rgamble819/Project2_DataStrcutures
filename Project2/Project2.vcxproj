@@ -154,6 +154,7 @@
     <ClCompile Include="Project2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Comparator.h" />
     <ClInclude Include="Enumerator.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="OULink.h" />
