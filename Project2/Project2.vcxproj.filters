@@ -32,5 +32,8 @@
     <ClInclude Include="OULinkedList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OULinkedListEnumerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
