@@ -19,3 +19,20 @@ public:
 
 
 #endif // !OU_LINK
+
+template<typename T>
+OULink<T>::OULink(T item)
+{
+	// Create new node with data containing item.
+	data = item;
+}
+
+template<typename T>
+OULink<T>::~OULink()
+{
+	delete data;
+	data = nullptr;
+
+	delete next;
+	next = nullptr;
+}
