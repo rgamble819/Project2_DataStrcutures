@@ -68,3 +68,23 @@ public:
 
 
 #endif // !OU_LINKED_LIST
+
+template<typename T>
+OULinkedList<T>::OULinkedList(Comparator<T>* comparator)
+{
+	// Creates new LinkedList object and sets the comparator to order the list.
+	this->comparator = comparator;
+}
+
+template<typename T>
+OULinkedList<T>::~OULinkedList()
+{
+	delete comparator;
+	comparator = nullptr;
+
+	delete first;
+	first = nullptr;
+
+	delete last;
+	last = nullptr;
+}
