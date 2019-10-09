@@ -20,3 +20,44 @@ public:
 
 
 #endif // !OU_LINKED_LIST_ENUMERATOR
+
+template<typename T>
+OULinkedListEnumerator<T>::OULinkedListEnumerator(OULink<T>* first)
+{
+	// Set current link to first link upon creation.
+	current = first;
+}
+
+template<typename T>
+bool OULinkedListEnumerator<T>::hasNext() const
+{
+	if (current->next == NULL) 
+	{
+		return false;
+	}
+	return true;
+}
+
+template<typename T>
+T OULinkedListEnumerator<T>::next()
+{
+	if (current->next == NULL) 
+	{
+		return new ExceptionEnumerationBeyondEnd();
+	}
+	// Set current to the next of the current element.
+	current = current->next;
+	return current->next;
+}
+
+template<typename T>
+T OULinkedListEnumerator<T>::peek() const
+{
+	if (current->next == NULL)
+	{
+		return new ExceptionEnumerationBeyondEnd();
+	}
+	return current->next;
+}
+
+

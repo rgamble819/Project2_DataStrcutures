@@ -88,3 +88,30 @@ OULinkedList<T>::~OULinkedList()
 	delete last;
 	last = nullptr;
 }
+
+
+// Deletes all links in the list and resets size to 0
+template<typename T>
+void OULinkedList<T>::clear()
+{
+	OULinkedListEnumerator<T>* enumerator = enumerator(first);
+
+	while (enumerator->hasNext()) 
+	{
+		delete enumerator
+	}
+}
+
+// returns the current number of items in the list
+template<typename T>
+unsigned long OULinkedList<T>::getSize() const
+{
+	return size;
+}
+
+// Creates and returns an enumerator for this linked list
+template<typename T>
+OULinkedListEnumerator<T> OULinkedList<T>::enumerator() const
+{
+	return OULinkedListEnumerator<T>(first);
+}
