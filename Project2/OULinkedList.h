@@ -87,7 +87,6 @@ OULinkedList<T>::~OULinkedList()
 	last = nullptr;
 }
 
-
 // if item is greater than item at last, append item at end and return true
 // if item is less than or equal to item at last, leave list unchanged and return false
 template<typename T>
@@ -123,7 +122,15 @@ T OULinkedList<T>::getFirst() const
 template<typename T>
 T OULinkedList<T>::pullFirst()
 {
-	if (first != NULL) return first->data;
+	if (first != NULL)
+	{
+		OULink<T>* nextElement = first->next;
+		T firstData = first->data;
+
+		first = nextElement;
+
+		return firstData;
+	}
 	else throw new ExceptionLinkedListAccess();
 }
 

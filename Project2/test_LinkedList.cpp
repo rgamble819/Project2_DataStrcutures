@@ -11,6 +11,7 @@ using namespace std;
 void testAppend();
 void testGetFirst();
 void testRemoveFirst();
+void testPullFirst();
 
 void success(string test);
 void fail(string test);
@@ -21,6 +22,7 @@ int main()
 	testAppend();
 	testGetFirst();
 	testRemoveFirst();
+	testPullFirst();
 
 
 	return -1;
@@ -113,6 +115,35 @@ void testRemoveFirst()
 		exc = NULL;
 
 		success("removeFirst");
+	}
+}
+
+void testPullFirst()
+{
+	// Create linked list structure.
+	TestComparator* comparator = new TestComparator();
+	OULinkedList<int>* list = new OULinkedList<int>(comparator);
+
+	// Add an item to the list
+	list->append(5);
+
+	if(assert(list->pullFirst(), 5))
+	{
+		try 
+		{
+			list->getFirst();
+			fail("pillFirst");
+		}
+		catch (ExceptionLinkedListAccess* exc) 
+		{
+			delete exc;
+			exc = NULL;
+			success("pullFirst");
+		}
+	}
+	else 
+	{
+		fail("pullFirst");
 	}
 }
 
