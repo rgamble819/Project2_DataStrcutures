@@ -95,14 +95,20 @@ bool OULinkedList<T>::append(T item)
 	if (last == NULL) 
 	{
 		OULink<T>* nextNode = new OULink<T>(item);
+		if (nextNode == NULL) throw new ExceptionMemoryNotAvailable();
+
 		first = nextNode;
 		last = nextNode;
+		size++;
 		return true;
 	}
 	else if (comparator->compare(item, last->data) == 1)
 	{
 		OULink<T>* nextNode = new OULink<T>(item);
+		if (nextNode == NULL) throw new ExceptionMemoryNotAvailable();
+
 		last->next = nextNode;
+		size++;
 		return true;
 	}
 	return false;
@@ -201,19 +207,11 @@ T OULinkedList<T>::find(T item) const
 template<typename T>
 void OULinkedList<T>::clear()
 {
-	// Track first element
-	T* temp = first->next;
-	while (size > 0)
-	{
-		delete first;
-		first = nullptr;
-
-		first = temp;
-
-		// Set tracked to subsequent element.
-		temp = first->next;
-		size--;
-	}
+	// Deleting first element calls delete on all subsequent elements.
+	delete first;
+	first = NULL;
+	// Reset size to 0.
+	size = 0;
 }
 
 // returns the current number of items in the list
