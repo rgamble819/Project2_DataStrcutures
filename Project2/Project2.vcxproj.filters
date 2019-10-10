@@ -38,7 +38,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="UnitTestsP2.cpp">
+    <ClCompile Include="test_LinkedList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TestComparator.cpp">

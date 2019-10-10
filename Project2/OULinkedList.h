@@ -118,16 +118,34 @@ T OULinkedList<T>::getFirst() const
 	else throw new ExceptionLinkedListAccess();
 }
 
+// if any items are present, return a copy of the first item, remove it from list
+// if no items are present, throw new ExceptionLinkedListAccess
+template<typename T>
+T OULinkedList<T>::pullFirst()
+{
+	if (first != NULL) return first->data;
+	else throw new ExceptionLinkedListAccess();
+}
+
+// if any items are present, remove the first item and return true
+// if no items are present, leave list unchanged and return false
 template<typename T>
 bool OULinkedList<T>::removeFirst()
 {
-	OULink<T> firstItem = first;
-	OULink<T> tempPtr = first->next;
+	if (first == NULL) return false;
+	else 
+	{
+		// Set pointer for next element after first.
+		OULink<T>* nextElement = first->next;
+		
+		// Delete first.
+		delete first;
+		first = NULL;
 
-	delete firstItem;
-	firstItem = nullptr;
-
-	first = tempPtr;
+		// Set first to the next Element.
+		first = nextElement;
+		return true;
+	}
 }
 
 template<typename T>

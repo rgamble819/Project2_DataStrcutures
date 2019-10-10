@@ -17,6 +17,6 @@ int TestComparator::compare(const int& item1, const int& item2) const
 	}
 	else 
 	{
-		return 0;
+		return 1;
 	}
 }

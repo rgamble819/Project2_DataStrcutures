@@ -152,7 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="TestComparator.cpp" />
-    <ClCompile Include="UnitTestsP2.cpp" />
+    <ClCompile Include="test_LinkedList.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Comparator.h" />
