@@ -122,8 +122,10 @@ T OULinkedList<T>::getFirst() const
 template<typename T>
 T OULinkedList<T>::pullFirst()
 {
+	// Check if element exists
 	if (first != NULL)
 	{
+		// Keep track of next element
 		OULink<T>* nextElement = first->next;
 		T firstData = first->data;
 
@@ -155,25 +157,24 @@ bool OULinkedList<T>::removeFirst()
 	}
 }
 
+// if an equivalent item is present, return true
+// if an equivalent item is not present, false
 template<typename T>
 bool OULinkedList<T>::contains(T item) const
 {
-	/*// Track next item
-	T itemToCheck = first.data;
+	// Keep track element
+	OULink<T>* currentElement = first;
 
-	// Count up until size is reached
-	long checkCount = 0;
-	while (checkCount < size)
+	// Loop through all elements until found of end it reached
+	while (currentElement != NULL) 
 	{
-		// Compare the itemToCheck with item it it equals, return the item found.
-		if (comparator->compare(itemToCheck, item) == 0)
+		if (comparator->compare(currentElement->data, item) == 0) 
 		{
 			return true;
 		}
-		itemToCheck = first->next.data;
-		checkCount++;
+		currentElement = currentElement->next;
 	}
-	throw new ExceptionLinkedListAccess();*/
+	return false;
 }
 
 template<typename T>

@@ -12,6 +12,7 @@ void testAppend();
 void testGetFirst();
 void testRemoveFirst();
 void testPullFirst();
+void testContains();
 
 void success(string test);
 void fail(string test);
@@ -23,6 +24,7 @@ int main()
 	testGetFirst();
 	testRemoveFirst();
 	testPullFirst();
+	testContains();
 
 
 	return -1;
@@ -54,22 +56,21 @@ void testAppend()
 		if (assert(list->getFirst(), 5))
 		{
 			list->append(10);
-			/*if(list->contains(10))
+			if(list->contains(10))
 			{
-				success("Append");
-				return;
-			}*/
+				success("append");
+			}
 		}
 		else 
 		{
-			fail("Append");
+			fail("append");
 		}
 	}
 	catch (ExceptionLinkedListAccess* exc)
 	{
 		delete exc;
 		exc = nullptr;
-		fail("Append");
+		fail("append");
 	}
 }
 
@@ -144,6 +145,23 @@ void testPullFirst()
 	else 
 	{
 		fail("pullFirst");
+	}
+}
+
+void testContains()
+{
+	// Create linked list structure.
+	TestComparator* comparator = new TestComparator();
+	OULinkedList<int>* list = new OULinkedList<int>(comparator);
+
+	list->append(5);
+	list->append(10);
+
+	if (assert(list->contains(5), true) 
+		&& assert(list->contains(10), true) 
+		&& assert(list->contains(7), false)) 
+	{
+		success("contains");
 	}
 }
 
