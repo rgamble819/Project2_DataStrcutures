@@ -18,8 +18,6 @@ public:
 // Add your implementation below this line. Do not add or modify anything above this line.
 
 
-#endif // !OU_LINK
-
 template<typename T>
 OULink<T>::OULink(T item)
 {
@@ -36,3 +34,5 @@ OULink<T>::~OULink()
 	delete next;
 	next = nullptr;
 }
+
+#endif // !OU_LINK

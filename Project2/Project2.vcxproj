@@ -151,7 +151,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Project2.cpp" />
+    <ClCompile Include="TestComparator.cpp" />
+    <ClCompile Include="UnitTestsP2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Comparator.h" />
@@ -160,6 +161,7 @@
     <ClInclude Include="OULink.h" />
     <ClInclude Include="OULinkedList.h" />
     <ClInclude Include="OULinkedListEnumerator.h" />
+    <ClInclude Include="TestComparator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

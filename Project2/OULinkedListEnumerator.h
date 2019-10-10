@@ -19,8 +19,6 @@ public:
 // Add your implementation below this line. Do not add or modify anything above this line.
 
 
-#endif // !OU_LINKED_LIST_ENUMERATOR
-
 template<typename T>
 OULinkedListEnumerator<T>::OULinkedListEnumerator(OULink<T>* first)
 {
@@ -31,7 +29,7 @@ OULinkedListEnumerator<T>::OULinkedListEnumerator(OULink<T>* first)
 template<typename T>
 bool OULinkedListEnumerator<T>::hasNext() const
 {
-	if (current->next == NULL) 
+	if (current->next == NULL)
 	{
 		return false;
 	}
@@ -41,7 +39,7 @@ bool OULinkedListEnumerator<T>::hasNext() const
 template<typename T>
 T OULinkedListEnumerator<T>::next()
 {
-	if (current->next == NULL) 
+	if (current->next == NULL)
 	{
 		return new ExceptionEnumerationBeyondEnd();
 	}
@@ -61,3 +59,6 @@ T OULinkedListEnumerator<T>::peek() const
 }
 
 
+
+
+#endif // !OU_LINKED_LIST_ENUMERATOR

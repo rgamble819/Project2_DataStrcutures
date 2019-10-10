@@ -67,8 +67,6 @@ public:
 // Add your implementation below this line. Do not add or modify anything above this line.
 
 
-#endif // !OU_LINKED_LIST
-
 template<typename T>
 OULinkedList<T>::OULinkedList(Comparator<T>* comparator)
 {
@@ -90,11 +88,38 @@ OULinkedList<T>::~OULinkedList()
 }
 
 
+// if item is greater than item at last, append item at end and return true
+// if item is less than or equal to item at last, leave list unchanged and return false
+template<typename T>
+bool OULinkedList<T>::append(T item)
+{
+	if (comparator->compare(item, last->data) == 1)
+	{
+		OULink<T> nextNode = new OULink<T>(item);
+		last->next = nextNode;
+		return true;
+	}
+	return false;
+}
+
+
+template<typename T>
+bool OULinkedList<T>::removeFirst()
+{
+	OULink<T> firstItem = first;
+	OULink<T> tempPtr = first->next;
+
+	delete firstItem;
+	firstItem = nullptr;
+
+	first = tempPtr;
+}
+
 template<typename T>
 bool OULinkedList<T>::contains(T item) const
 {
 	// Track next item
-	T* itemToCheck = first;
+	T* itemToCheck = first.data;
 
 	// Count up until size is reached
 	long checkCount = 0;
@@ -105,7 +130,7 @@ bool OULinkedList<T>::contains(T item) const
 		{
 			return true;
 		}
-		itemToCheck = first->next;
+		itemToCheck = first->next.data;
 		checkCount++;
 	}
 	throw new ExceptionLinkedListAccess();
@@ -115,18 +140,18 @@ template<typename T>
 T OULinkedList<T>::find(T item) const
 {
 	// Track next item
-	T* itemToCheck = first;
+	T* itemToCheck = first->data;
 
 	// Count up until size is reached
 	long checkCount = 0;
-	while (checkCount < size) 
+	while (checkCount < size)
 	{
 		// Compare the itemToCheck with item it it equals, return the item found.
-		if (comparator->compare(itemToCheck, item) == 0) 
+		if (comparator->compare(itemToCheck, item) == 0)
 		{
 			return itemToCheck;
 		}
-		itemToCheck = first->next;
+		itemToCheck = first->next->data;
 		checkCount++;
 	}
 	throw new ExceptionLinkedListAccess();
@@ -138,7 +163,7 @@ void OULinkedList<T>::clear()
 {
 	// Track first element
 	T* temp = first->next;
-	while (size > 0) 
+	while (size > 0)
 	{
 		delete first;
 		first = nullptr;
@@ -164,3 +189,6 @@ OULinkedListEnumerator<T> OULinkedList<T>::enumerator() const
 {
 	return OULinkedListEnumerator<T>(first);
 }
+
+
+#endif // !OU_LINKED_LIST
