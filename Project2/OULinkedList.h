@@ -177,23 +177,22 @@ bool OULinkedList<T>::contains(T item) const
 	return false;
 }
 
+// if an equivalent item is present, return a copy of that item
+// if an equivalent item is not present, throw a new ExceptionLinkedListAccess
 template<typename T>
 T OULinkedList<T>::find(T item) const
 {
-	// Track next item
-	T* itemToCheck = first->data;
+	// Keep track element
+	OULink<T>* currentElement = first;
 
-	// Count up until size is reached
-	long checkCount = 0;
-	while (checkCount < size)
+	// Loop through all elements until found of end it reached
+	while (currentElement != NULL)
 	{
-		// Compare the itemToCheck with item it it equals, return the item found.
-		if (comparator->compare(itemToCheck, item) == 0)
+		if (comparator->compare(currentElement->data, item) == 0)
 		{
-			return itemToCheck;
+			return currentElement->data;
 		}
-		itemToCheck = first->next->data;
-		checkCount++;
+		currentElement = currentElement->next;
 	}
 	throw new ExceptionLinkedListAccess();
 }

@@ -13,6 +13,7 @@ void testGetFirst();
 void testRemoveFirst();
 void testPullFirst();
 void testContains();
+void testFind();
 
 void success(string test);
 void fail(string test);
@@ -25,6 +26,7 @@ int main()
 	testRemoveFirst();
 	testPullFirst();
 	testContains();
+	testFind();
 
 
 	return -1;
@@ -162,6 +164,35 @@ void testContains()
 		&& assert(list->contains(7), false)) 
 	{
 		success("contains");
+	}
+}
+
+void testFind() 
+{
+	// Create linked list structure.
+	TestComparator* comparator = new TestComparator();
+	OULinkedList<int>* list = new OULinkedList<int>(comparator);
+
+	list->append(5);
+	list->append(10);
+
+	if (assert(list->find(10), 10))
+	{
+		try 
+		{
+			list->find(7);
+			fail("find");
+		}
+		catch (ExceptionLinkedListAccess* exc) 
+		{
+			delete exc;
+			exc = NULL;
+			success("find");
+		}
+	}
+	else 
+	{
+		fail("find");
 	}
 }
 
