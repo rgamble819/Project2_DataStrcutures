@@ -93,7 +93,14 @@ OULinkedList<T>::~OULinkedList()
 template<typename T>
 bool OULinkedList<T>::append(T item)
 {
-	if (comparator->compare(item, last->data) == 1)
+	if (last == NULL) 
+	{
+		OULink<T>* nextNode = new OULink<T>(item);
+		first = nextNode;
+		last = nextNode;
+		return true;
+	}
+	else if (comparator->compare(item, last->data) == 1)
 	{
 		OULink<T>* nextNode = new OULink<T>(item);
 		last->next = nextNode;
@@ -102,6 +109,14 @@ bool OULinkedList<T>::append(T item)
 	return false;
 }
 
+// if any items are present, return a copy of the first item
+// if no items are present, throw new ExceptionLinkedListAccess
+template<typename T>
+T OULinkedList<T>::getFirst() const
+{
+	if (first != NULL) return first->data;
+	else throw new ExceptionLinkedListAccess();
+}
 
 template<typename T>
 bool OULinkedList<T>::removeFirst()
@@ -118,8 +133,8 @@ bool OULinkedList<T>::removeFirst()
 template<typename T>
 bool OULinkedList<T>::contains(T item) const
 {
-	// Track next item
-	T* itemToCheck = first.data;
+	/*// Track next item
+	T itemToCheck = first.data;
 
 	// Count up until size is reached
 	long checkCount = 0;
@@ -133,7 +148,7 @@ bool OULinkedList<T>::contains(T item) const
 		itemToCheck = first->next.data;
 		checkCount++;
 	}
-	throw new ExceptionLinkedListAccess();
+	throw new ExceptionLinkedListAccess();*/
 }
 
 template<typename T>
