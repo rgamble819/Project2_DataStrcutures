@@ -7,7 +7,7 @@ class OULink {
 	friend class OULinkedList;
 	template <typename T>
 	friend class OULinkedListEnumerator;
-	private
+	private:
 		T data{};                  // data item of any type
 	OULink* next = NULL;       // pointer to next link
 public:
@@ -16,7 +16,6 @@ public:
 };
 
 // Add your implementation below this line. Do not add or modify anything above this line.
-
 
 template<typename T>
 OULink<T>::OULink(T item)
@@ -28,9 +27,6 @@ OULink<T>::OULink(T item)
 template<typename T>
 OULink<T>::~OULink()
 {
-	delete data;
-	data = nullptr;
-
 	delete next;
 	next = nullptr;
 }

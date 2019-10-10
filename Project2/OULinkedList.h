@@ -95,7 +95,7 @@ bool OULinkedList<T>::append(T item)
 {
 	if (comparator->compare(item, last->data) == 1)
 	{
-		OULink<T> nextNode = new OULink<T>(item);
+		OULink<T>* nextNode = new OULink<T>(item);
 		last->next = nextNode;
 		return true;
 	}
