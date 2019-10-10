@@ -90,15 +90,64 @@ OULinkedList<T>::~OULinkedList()
 }
 
 
+template<typename T>
+bool OULinkedList<T>::contains(T item) const
+{
+	// Track next item
+	T* itemToCheck = first;
+
+	// Count up until size is reached
+	long checkCount = 0;
+	while (checkCount < size)
+	{
+		// Compare the itemToCheck with item it it equals, return the item found.
+		if (comparator->compare(itemToCheck, item) == 0)
+		{
+			return true;
+		}
+		itemToCheck = first->next;
+		checkCount++;
+	}
+	throw new ExceptionLinkedListAccess();
+}
+
+template<typename T>
+T OULinkedList<T>::find(T item) const
+{
+	// Track next item
+	T* itemToCheck = first;
+
+	// Count up until size is reached
+	long checkCount = 0;
+	while (checkCount < size) 
+	{
+		// Compare the itemToCheck with item it it equals, return the item found.
+		if (comparator->compare(itemToCheck, item) == 0) 
+		{
+			return itemToCheck;
+		}
+		itemToCheck = first->next;
+		checkCount++;
+	}
+	throw new ExceptionLinkedListAccess();
+}
+
 // Deletes all links in the list and resets size to 0
 template<typename T>
 void OULinkedList<T>::clear()
 {
-	OULinkedListEnumerator<T>* enumerator = enumerator(first);
-
-	while (enumerator->hasNext()) 
+	// Track first element
+	T* temp = first->next;
+	while (size > 0) 
 	{
-		delete enumerator
+		delete first;
+		first = nullptr;
+
+		first = temp;
+
+		// Set tracked to subsequent element.
+		temp = first->next;
+		size--;
 	}
 }
 
