@@ -15,6 +15,8 @@ void testPullFirst();
 void testContains();
 void testFind();
 void testClear();
+void testGetSize();
+void testEnumerator();
 
 void success(string test);
 void fail(string test);
@@ -29,6 +31,8 @@ int main()
 	testContains();
 	testFind();
 	testClear();
+	testGetSize();
+	testEnumerator();
 
 
 	return -1;
@@ -231,6 +235,77 @@ void testClear()
 
 		success("clear");
 	}
+}
+
+void testGetSize() 
+{
+	// Create linked list structure.
+	TestComparator* comparator = new TestComparator();
+	OULinkedList<int>* list = new OULinkedList<int>(comparator);
+
+	int itemsToAdd = 25;
+	for (int counter = 0; counter < itemsToAdd; counter++)
+	{
+		list->append(counter);
+	}
+
+	if (assert(list->getSize(), (unsigned long)25)) 
+	{
+		success("getSize");
+	}
+	else 
+	{
+		fail("getSize");
+	}
+}
+
+void testEnumerator() 
+{
+	// Create linked list structure.
+	TestComparator* comparator = new TestComparator();
+	OULinkedList<int>* list = new OULinkedList<int>(comparator);
+
+	int itemsToAdd = 25;
+	for (int counter = 0; counter < itemsToAdd; counter++)
+	{
+		list->append(counter);
+	}
+
+	OULinkedListEnumerator<int> iterator = list->enumerator();
+
+	int nextCounter = 0;
+	while (iterator.hasNext()) 
+	{
+		iterator.next();
+		nextCounter++;
+	}
+
+	if (assert(nextCounter, 24)) success("enumerator hasNext()");
+	else fail("enumerator hasNext()"); 
+
+	iterator = list->enumerator();
+
+	int countSuccess = 0;
+	while (iterator.hasNext()) 
+	{
+		list->pullFirst();
+		if (assert(iterator.next(), list->getFirst())) 
+		{
+			countSuccess++;
+		}
+	}
+
+	if (countSuccess == 24) success("enumerator next()");
+	else fail("enumerator next()");
+
+	list->clear();
+	list->append(2);
+	list->append(3);
+
+	OULinkedListEnumerator<int> iterator2 = list->enumerator();
+	
+	if (iterator2.peek() == 3) success("enumerator peek()");
+	else fail("enumerator peek()");
 }
 
 void success(string test)

@@ -28,7 +28,7 @@ template<typename T>
 OULink<T>::~OULink()
 {
 	delete next;
-	next = nullptr;
+	next = NULL;
 }
 
 #endif // !OU_LINK

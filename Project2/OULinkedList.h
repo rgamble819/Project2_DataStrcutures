@@ -92,7 +92,7 @@ OULinkedList<T>::~OULinkedList()
 template<typename T>
 bool OULinkedList<T>::append(T item)
 {
-	if (last == NULL) 
+	if (first == NULL) 
 	{
 		OULink<T>* nextNode = new OULink<T>(item);
 		if (nextNode == NULL) throw new ExceptionMemoryNotAvailable();
@@ -107,7 +107,10 @@ bool OULinkedList<T>::append(T item)
 		OULink<T>* nextNode = new OULink<T>(item);
 		if (nextNode == NULL) throw new ExceptionMemoryNotAvailable();
 
-		last->next = nextNode;
+		OULink<T>* previousNode = last;
+		last = nextNode;
+		previousNode->next = last;
+
 		size++;
 		return true;
 	}
@@ -208,8 +211,10 @@ template<typename T>
 void OULinkedList<T>::clear()
 {
 	// Deleting first element calls delete on all subsequent elements.
+	
 	delete first;
 	first = NULL;
+
 	// Reset size to 0.
 	size = 0;
 }
