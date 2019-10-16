@@ -22,7 +22,7 @@ void testInsert();
 void success(string test);
 void fail(string test);
 
-int main()
+int main2()
 {	
 	testAppend();
 	testGetFirst();

@@ -77,8 +77,6 @@ OULinkedList<T>::OULinkedList(Comparator<T>* comparator)
 template<typename T>
 OULinkedList<T>::~OULinkedList()
 {
-	delete comparator;
-	comparator = nullptr;
 
 	delete first;
 	first = nullptr;
@@ -130,6 +128,7 @@ bool OULinkedList<T>::insert(T item)
 			break;
 		}
 	}
+	return false;
 }
 
 // if item is greater than item at last, append item at end and return true
@@ -183,6 +182,12 @@ bool OULinkedList<T>::append(T item)
 		return true;
 	}
 	return false;*/
+}
+
+template<typename T>
+inline bool OULinkedList<T>::replace(T item)
+{
+	return false;
 }
 
 // if an equivalent item is already present, remove item and return true

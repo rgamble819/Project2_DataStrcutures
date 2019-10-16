@@ -65,5 +65,8 @@
     <ClCompile Include="DrillingRecordComparator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Driller2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
