@@ -151,17 +151,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DrillingRecord.cpp" />
+    <ClCompile Include="DrillingRecordComparator.cpp" />
     <ClCompile Include="TestComparator.cpp" />
     <ClCompile Include="test_LinkedList.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Comparator.h" />
+    <ClInclude Include="DrillingRecord.h" />
+    <ClInclude Include="DrillingRecordComparator.h" />
     <ClInclude Include="Enumerator.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="OULink.h" />
     <ClInclude Include="OULinkedList.h" />
     <ClInclude Include="OULinkedListEnumerator.h" />
+    <ClInclude Include="ResizableArray.h" />
     <ClInclude Include="Search.h" />
+    <ClInclude Include="Sorter.h" />
     <ClInclude Include="TestComparator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
