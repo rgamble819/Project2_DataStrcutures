@@ -87,6 +87,14 @@ OULinkedList<T>::~OULinkedList()
 	last = nullptr;
 }
 
+// if an equivalent item is not already present, insert item in order and return true
+// if an equivalent item is already present, leave list unchanged and return false
+template<typename T>
+bool OULinkedList<T>::insert(T item)
+{
+
+}
+
 // if item is greater than item at last, append item at end and return true
 // if item is less than or equal to item at last, leave list unchanged and return false
 template<typename T>
@@ -113,6 +121,50 @@ bool OULinkedList<T>::append(T item)
 
 		size++;
 		return true;
+	}
+	return false;
+}
+
+// if an equivalent item is already present, remove item and return true
+// if an equivalent item is not already present, leave list unchanged and return false
+template<typename T>
+bool OULinkedList<T>::remove(T item)
+{	
+
+	OULink<T>* previousElement = first;
+	OULink<T>* currentElement = first;
+
+	// Check first element.
+	if (first == NULL) return false;
+	if(comparator->compare(first->data, item) == 0)
+	{
+		first = first->next;
+		previousElement->next = NULL;
+		//delete previousElement;
+
+		return true;
+	}
+
+	// Check elements after first
+	currentElement = previousElement->next;
+	while (currentElement != NULL) 
+	{
+		if (comparator->compare(currentElement->data, item) == 0) 
+		{
+			// Assign next to the matching link's next.
+			previousElement->next = currentElement->next;
+
+			// Set the next of the current element to NULL in order to delete properly.
+			currentElement->next = NULL;
+			delete currentElement; 
+			currentElement = NULL;
+			return true;
+		}
+		else
+		{
+			previousElement = currentElement;
+			currentElement = currentElement->next;
+		}
 	}
 	return false;
 }

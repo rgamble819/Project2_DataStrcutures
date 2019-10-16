@@ -17,10 +17,10 @@ void testFind();
 void testClear();
 void testGetSize();
 void testEnumerator();
+void testRemove();
 
 void success(string test);
 void fail(string test);
-
 
 int main()
 {	
@@ -33,6 +33,7 @@ int main()
 	testClear();
 	testGetSize();
 	testEnumerator();
+	testRemove();
 
 
 	return -1;
@@ -265,6 +266,7 @@ void testEnumerator()
 	TestComparator* comparator = new TestComparator();
 	OULinkedList<int>* list = new OULinkedList<int>(comparator);
 
+	/// Test hasNext
 	int itemsToAdd = 25;
 	for (int counter = 0; counter < itemsToAdd; counter++)
 	{
@@ -285,11 +287,11 @@ void testEnumerator()
 
 	iterator = list->enumerator();
 
+	// Test next
 	int countSuccess = 0;
 	while (iterator.hasNext()) 
 	{
-		list->pullFirst();
-		if (assert(iterator.next(), list->getFirst())) 
+		if (assert(iterator.next(), list->pullFirst())) 
 		{
 			countSuccess++;
 		}
@@ -298,14 +300,58 @@ void testEnumerator()
 	if (countSuccess == 24) success("enumerator next()");
 	else fail("enumerator next()");
 
+	// Test peek
 	list->clear();
 	list->append(2);
 	list->append(3);
 
 	OULinkedListEnumerator<int> iterator2 = list->enumerator();
 	
-	if (iterator2.peek() == 3) success("enumerator peek()");
+	if (iterator2.peek() == 2) success("enumerator peek()");
 	else fail("enumerator peek()");
+}
+
+void testRemove() 
+{
+	// Create linked list structure.
+	TestComparator* comparator = new TestComparator();
+	OULinkedList<int>* list = new OULinkedList<int>(comparator);
+
+	// Test removing an element within the middle of the list.
+	int itemsToAdd = 25;
+	for (int counter = 0; counter < itemsToAdd; counter++)
+	{
+		list->append(counter);
+	}
+
+	list->remove(5);
+
+	// Test removing first element
+	list->remove(0);
+
+	int counter = 0;
+	OULinkedListEnumerator<int> iterator = list->enumerator();
+	while (iterator.hasNext())
+	{
+		int nex = iterator.next();
+		counter++;
+	}
+
+	if (assert(list->contains(5), false)) 
+	{
+		if (assert(list->contains(0), false)) {
+			if (assert(counter, 22)) success("remove");
+			else fail("remove");
+		}
+		else 
+		{
+			fail("remove");
+		}
+	}
+	else 
+	{
+		fail("remove");
+	}
 }
 
 void success(string test)

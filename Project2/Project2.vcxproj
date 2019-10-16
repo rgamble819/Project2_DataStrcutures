@@ -161,6 +161,7 @@
     <ClInclude Include="OULink.h" />
     <ClInclude Include="OULinkedList.h" />
     <ClInclude Include="OULinkedListEnumerator.h" />
+    <ClInclude Include="Search.h" />
     <ClInclude Include="TestComparator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

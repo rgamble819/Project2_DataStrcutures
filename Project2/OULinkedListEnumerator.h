@@ -36,15 +36,18 @@ bool OULinkedListEnumerator<T>::hasNext() const
 	return false;
 }
 
+
+// Might need to change these to return current then advance current.
 template<typename T>
 T OULinkedListEnumerator<T>::next()
 {
+	OULink<T>* previousElement = current;
 	OULink<int>* nextElement = current->next;
 	if (nextElement == NULL) throw new ExceptionEnumerationBeyondEnd();
 	
 	// Set current to the next of the current element.
 	current = nextElement;
-	return current->data;
+	return previousElement->data;
 }
 
 template<typename T>
@@ -54,7 +57,7 @@ T OULinkedListEnumerator<T>::peek() const
 	{
 		throw new ExceptionEnumerationBeyondEnd();
 	}
-	return current->next->data;
+	return current->data;
 }
 
 
