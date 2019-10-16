@@ -3,9 +3,9 @@
 
 template <typename T>
 class OULink {
-	template <typename T>
+	template <typename U>
 	friend class OULinkedList;
-	template <typename T>
+	template <typename U>
 	friend class OULinkedListEnumerator;
 	private:
 		T data{};                  // data item of any type

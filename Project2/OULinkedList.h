@@ -92,7 +92,44 @@ OULinkedList<T>::~OULinkedList()
 template<typename T>
 bool OULinkedList<T>::insert(T item)
 {
+	OULink<T>* previousElement = first;
+	OULink<T>* currentElement = first;
 
+	if (this->append(item)) return true;
+
+	while (currentElement != NULL) 
+	{
+		OULink<T>* linkToInsert = new OULink<T>(item);
+		switch (comparator->compare(item, currentElement->data))
+		{
+			// If a duplicate of the item is found.
+			case 0:
+				delete linkToInsert;
+				linkToInsert = NULL;
+				return false;
+			break;
+			// If the item is less than the current element insert the item into the list.
+			case -1:
+				if (currentElement == first) 
+				{
+					linkToInsert->next = first;
+					first = linkToInsert;
+				}
+				else 
+				{
+					previousElement->next = linkToInsert;
+					linkToInsert->next = currentElement;
+				}
+				size++;
+				return true;
+			break;
+			// If the item is greater than the current element them continue with the loop.
+			case 1:
+				previousElement = currentElement;
+				currentElement = currentElement->next;
+			break;
+		}
+	}
 }
 
 // if item is greater than item at last, append item at end and return true
@@ -100,7 +137,30 @@ bool OULinkedList<T>::insert(T item)
 template<typename T>
 bool OULinkedList<T>::append(T item)
 {
+	if (last != NULL && comparator->compare(item, last->data) <= 0) return false;
+
+	OULink<T>* linkToAppend = new OULink<T>(item);
+
 	if (first == NULL) 
+	{
+		first = linkToAppend;
+	}
+	else 
+	{
+		last->next = linkToAppend;
+	}
+
+	last = linkToAppend;
+	size++;
+	return true;
+
+	/*
+	if(last != NULL && item <= last->data){return false}
+	// Create OULink*
+	if list is empty or if list has elements
+
+	*/
+	/*if (first == NULL) 
 	{
 		OULink<T>* nextNode = new OULink<T>(item);
 		if (nextNode == NULL) throw new ExceptionMemoryNotAvailable();
@@ -122,7 +182,7 @@ bool OULinkedList<T>::append(T item)
 		size++;
 		return true;
 	}
-	return false;
+	return false;*/
 }
 
 // if an equivalent item is already present, remove item and return true

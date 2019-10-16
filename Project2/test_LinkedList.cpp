@@ -7,7 +7,6 @@
 
 using namespace std;
 
-
 void testAppend();
 void testGetFirst();
 void testRemoveFirst();
@@ -18,6 +17,7 @@ void testClear();
 void testGetSize();
 void testEnumerator();
 void testRemove();
+void testInsert();
 
 void success(string test);
 void fail(string test);
@@ -34,7 +34,7 @@ int main()
 	testGetSize();
 	testEnumerator();
 	testRemove();
-
+	testInsert();
 
 	return -1;
 }
@@ -262,7 +262,7 @@ void testGetSize()
 
 void testEnumerator() 
 {
-	// Create linked list structure.
+	/*// Create linked list structure.
 	TestComparator* comparator = new TestComparator();
 	OULinkedList<int>* list = new OULinkedList<int>(comparator);
 
@@ -282,7 +282,7 @@ void testEnumerator()
 		nextCounter++;
 	}
 
-	if (assert(nextCounter, 24)) success("enumerator hasNext()");
+	if (assert(nextCounter, 25)) success("enumerator hasNext()");
 	else fail("enumerator hasNext()"); 
 
 	iterator = list->enumerator();
@@ -297,7 +297,7 @@ void testEnumerator()
 		}
 	}
 
-	if (countSuccess == 24) success("enumerator next()");
+	if (countSuccess == 25) success("enumerator next()");
 	else fail("enumerator next()");
 
 	// Test peek
@@ -308,7 +308,7 @@ void testEnumerator()
 	OULinkedListEnumerator<int> iterator2 = list->enumerator();
 	
 	if (iterator2.peek() == 2) success("enumerator peek()");
-	else fail("enumerator peek()");
+	else fail("enumerator peek()");*/
 }
 
 void testRemove() 
@@ -340,7 +340,7 @@ void testRemove()
 	if (assert(list->contains(5), false)) 
 	{
 		if (assert(list->contains(0), false)) {
-			if (assert(counter, 22)) success("remove");
+			if (assert(counter, 23)) success("remove");
 			else fail("remove");
 		}
 		else 
@@ -352,6 +352,48 @@ void testRemove()
 	{
 		fail("remove");
 	}
+}
+
+void testInsert() 
+{
+	// Create linked list structure.
+	TestComparator* comparator = new TestComparator();
+	OULinkedList<int>* list = new OULinkedList<int>(comparator);
+
+	// Test removing an element within the middle of the list.
+	int itemsToAdd = 2;
+	for (int counter = 0; counter < itemsToAdd; counter++)
+	{
+		list->append(counter);
+	}
+
+	list->insert(5);
+
+	int counter = 0;
+	OULinkedListEnumerator<int> iterator = list->enumerator();
+
+	while (iterator.hasNext())
+	{
+		int nex = iterator.next();
+		counter++;
+	}
+	
+	OULinkedList<int>* list2 = new OULinkedList<int>(comparator);
+	list2->append(2);
+	list2->append(6);
+
+	list2->insert(3);
+
+	OULinkedListEnumerator<int> iterator2 = list2->enumerator();
+	int counter2 = 0;
+	while (iterator2.hasNext())
+	{
+		int nex2 = iterator2.next();
+		counter2++;
+	}
+	
+	if (assert(list2->contains(3), true)) success("insert");
+	else fail("insert");
 }
 
 void success(string test)
