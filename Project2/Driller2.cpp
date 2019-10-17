@@ -16,6 +16,9 @@ void dataInputLoop(OULinkedList<DrillingRecord>* drillList, int* drillInfo); // 
 void readFileStream(OULinkedList<DrillingRecord>* drillList, std::ifstream& in, int* lineData); // opens file stream
 DrillingRecord* parseRow(OULinkedList<DrillingRecord>* drillList, std::string lineOfData, int row); // Parses each row.
 
+template <typename T>
+void mergeLists(OULinkedList<T>* originalList, OULinkedList<T>* newList);
+
 void dataManipulationLoop(OULinkedList<DrillingRecord>* drillList, int* fileData);
 
 bool checkDateStamp(DrillingRecord* recordToAdd, OULinkedList<DrillingRecord>* drillList); // Check if date stamp matches the inital date stamp in drill array.
@@ -50,6 +53,7 @@ int main()
 	return 0;
 }
 
+// Allow the user to specify what file to include.
 void dataInputLoop(OULinkedList<DrillingRecord>* drillList, int* drillInfo)
 {
 	// Get the name of the file directly from user.
@@ -172,6 +176,7 @@ DrillingRecord* parseRow(OULinkedList<DrillingRecord>* drillList, string lineOfD
 	return recordToReturn;
 }
 
+// Takes input file stream as parameter and reads the file.
 void readFileStream(OULinkedList<DrillingRecord>* drillList, ifstream& in, int* lineData)
 {
 	// Skip first line in the file.
@@ -422,6 +427,17 @@ void dataManipulationLoop(OULinkedList<DrillingRecord>* drillList, int* fileData
 			findOption(drillArray, sortedColumn);
 			break;
 		case 'm':
+			// Create new list that contains the records to be read in.
+			DrillingRecordComparator* timeStampComparator = new DrillingRecordComparator(1);
+			if (timeStampComparator == NULL) throw new ExceptionMemoryNotAvailable;
+			OULinkedList<DrillingRecord>* drillListToMerge = new OULinkedList<DrillingRecord>(timeStampComparator);
+			if (timeStampComparator == NULL) throw new ExceptionMemoryNotAvailable;
+
+			// Get file input from the user.
+			dataInputLoop(drillListToMerge, fileData);
+
+			// Merges the two lists. Make sure original list is first argument.
+			mergeLists(drillList, drillListToMerge);
 			break;
 		case 'p':
 			break;
@@ -509,3 +525,19 @@ void drillerOutput(OULinkedList<DrillingRecord>* drillList, int* fileData)
 4. finish purge
 5. finish records
 */
+template <typename T>
+void mergeLists(OULinkedList<T>* originalList, OULinkedList<T>* newList)
+{
+	// Create enumerator to loop through.
+	OULinkedListEnumerator<T> iterator = newList->enumerator();
+	while (iterator.hasNext()) 
+	{
+		T newRecord = iterator.next();
+
+		// Attempt to insert new record. If insert returns false, replace.
+		if (!originalList->insert(newRecord)) 
+		{
+			originalList->replace(newRecord);
+		}
+	}
+}
