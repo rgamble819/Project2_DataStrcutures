@@ -1,299 +1,251 @@
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <sstream>
+#include <fstream>
 
 #include"DrillingRecord.h"
 #include"Search.h"
 #include "DrillingRecordComparator.h"
 #include"Sorter.h"
+#include"OULinkedList.h"
+#include"OULinkedListEnumerator.h"
 
-using namespace std;
+void drillerOutput(OULinkedList<DrillingRecord>* drillList, int* fileData); // Output data to specified location
 
-void dataManipulationLoop(ResizableArray<DrillingRecord>* drillArray, int* fileData); // Enter user data manipulation loop. Ability to chose output, sort, or find. returns void.
-void drillerOutput(ResizableArray<DrillingRecord>* drillArray, int* fileData); // Output data to specified location
+void dataInputLoop(OULinkedList<DrillingRecord>* drillList, int* drillInfo); // Begin data inputloop
+void readFileStream(OULinkedList<DrillingRecord>* drillList, std::ifstream& in, int* lineData); // opens file stream
+DrillingRecord* parseRow(OULinkedList<DrillingRecord>* drillList, std::string lineOfData, int row); // Parses each row.
 
-int* getFilesFromUser(ResizableArray<DrillingRecord>* drillArray); // Reads in files specified by user. Returns integer array of size 2 - Element 0 is the number of rows read in and Element 1 is the number of valid lines.
+void dataManipulationLoop(OULinkedList<DrillingRecord>* drillList, int* fileData);
 
-bool checkDateStamp(DrillingRecord* recordToAdd, ResizableArray<DrillingRecord>* drillArray); // Check if date stamp matches the inital date stamp in drill array.
-
-int checkTimeStamp(DrillingRecord* recordToAdd, ResizableArray<DrillingRecord>* drillArray, long originalSize); // This method check if duplicate records exist. returns -1,0,1. Details for return data can be seen at function signature.
+bool checkDateStamp(DrillingRecord* recordToAdd, OULinkedList<DrillingRecord>* drillList); // Check if date stamp matches the inital date stamp in drill array.
+bool duplicateTimeStampExists(DrillingRecord* recordToAdd, OULinkedList<DrillingRecord>* drillList); // This method check if duplicate records exist. returns -1,0,1. Details for return data can be seen at function signature.
+bool isInvalidFloat(double value);
 
 int sortOption(ResizableArray<DrillingRecord>* drillArray); // Function that is executed when the user chooses sort in the data manipulation loop.
 void findOption(ResizableArray<DrillingRecord>* drillArray, int sortedColumn); // Function that is executed when the user chooses find in the data manipulation loop.
 
+using namespace std;
+
 int main()
 {
-	ResizableArray<DrillingRecord>* drillArray = new ResizableArray<DrillingRecord>(); // Create drilling array to store DrillingRecords.
-	if (drillArray == NULL) throw new ExceptionMemoryNotAvailable;
+	// Create comparator to construct linked list sorted by time stamps.
+	DrillingRecordComparator* drillTimeComparator = new DrillingRecordComparator(1);
+	OULinkedList<DrillingRecord>* drillList = new OULinkedList<DrillingRecord>(drillTimeComparator);
+	if (drillTimeComparator == NULL) throw new ExceptionMemoryNotAvailable;
+	if (drillList == NULL) throw new ExceptionMemoryNotAvailable;
+	
+	// [0] is number of rows read in. [1] is number of valid lines.
+	int* drillInfo = new int[2];
+	drillInfo[0] = 0; drillInfo[1] = 0;
 
-	// [0] is lines read [1] is valid records. I am simply returning the values calculated from reading the files for use in output.
-	int* recordData = getFilesFromUser(drillArray); // Read data from files specified by user.
-
-	// Sort the record by default by timestamps 
-	DrillingRecordComparator* comparator = new DrillingRecordComparator(1);
-	if (comparator == NULL) throw new ExceptionMemoryNotAvailable;
-
-	// TODO: Examine if i should sort while inserting or after.
-	Sorter<DrillingRecord>::sort(*drillArray, *comparator);
-
-	// Delete comparator
-	//delete comparator;
-	//comparator = NULL;
-
-	// If there is DrillingRecords enter data manipulation loop.
-	if (drillArray->getSize() > 0)
-	{
-		dataManipulationLoop(drillArray, recordData);
-	}
+	dataInputLoop(drillList, drillInfo);
+	dataManipulationLoop(drillList, drillInfo);
 
 	// Only display thank you message if Driller is used.
-	if (drillArray->getSize() > 0)
+	if (drillList->getSize() > 0)
 	{
 		cout << "Thanks for using Driller.\n";
 	}
 	return 0;
 }
 
-/*
-// Read in selected files from the user. 
-// Returns integer array of size 2. [0] is rowsRead and [1] is valid lines.
-int* getFilesFromUser(ResizableArray<DrillingRecord>* drillArray)
+void dataInputLoop(OULinkedList<DrillingRecord>* drillList, int* drillInfo)
 {
-	// Keep track of valid lines & lines read
-	int valid = 0;
-	int rowsRead = 0;
-	long originalSize = drillArray->getSize();
-
-	// Idex to remove in the event of a duplicate time stamp in subsequent files.
-	int indexToRemove = -1;
-
-	//get first filename
+	// Get the name of the file directly from user.
 	cout << "Enter data file name: ";
 	string filename = "";
 	getline(cin, filename, '\n');
 
-	// Track if the files input is the first file or not
-	bool firstFile = true;
-
-	// Begin filename userinput loop as long as there is an input.
-	while (!filename.empty())
+	// If input is empty exit loop.
+	while (!filename.empty()) 
 	{
-
-		// Open stream to the file inputed
-		ifstream in;
+		// Open input stream to the specified file
+		std::ifstream in;
 		in.open(filename);
 
-		// Check if the file is valid and read data if true.
+		// Check if this stream is to a valid file.
 		if (in.fail())
 		{
 			cout << "File is not available.\n";
 		}
 		else
 		{
-			// Skip first line in file.
-			string line = "";
-			getline(in, line);
-			line = "";
-
-			// Track data of rows read in.
-			int row = 0;
-
-			// Begin reading the rows of the file specified.
-			while (getline(in, line))
+			readFileStream(drillList, in, drillInfo);
+			// Check if there is any valid records in the list
+			if (!(drillList->getSize() > 0)) 
 			{
-				rowsRead++;
-				row++; // Increment Row.
+				cout << "No valid records found.";
 
-				//Create dataRecord for each DrillingRecord
-				DrillingRecord* recordToAdd = new DrillingRecord;
-				if (recordToAdd == NULL) throw new ExceptionMemoryNotAvailable;
-
-				//Open String stream
-				stringstream dataLine(line);
-				string value = ""; // Value in column
-
-				// This loop seperates the CSV values and check validity.
-				// If the line is not valid, it will change the skipRow value to true and not add it to the Drilling Record.
-
-				// We will be be adding data to the record as the data values are read in. We will check these records being constructed with the records in memory
-				// If there is an invalid record, we will delete the record when the skipRow value switches to true.
-				int column = 0;
-				bool skipRow = false;
-				/*
-				cout << "\n";
-				int ind = drillArray->getSize() - 1;
-				while (ind >= 0)
-				{
-					cout << drillArray->get(ind) << "\n";
-					ind--;
-				}
-				cout << "\n";//////////////////////
-
-				while (getline(dataLine, value, ','))
-				{
-					// Check if the two files have matching date stamps.
-					if (column == 0)
-					{
-						recordToAdd->addString(value);
-						// Check that the date in the file matches the others
-						// Also check that the first date in the subsequent files matches the first.
-						if (!checkDateStamp(recordToAdd, drillArray))
-						{
-							// If it is the first file check that the time stamp matches the first file
-							if (!firstFile)
-							{
-								if (drillArray->get(0).getString(0).compare(value) != 0)
-								{
-									// Clear the streams so that the loops terminate
-									cout << "Date mismatch; file closed.\n";
-									value = "";
-									dataLine.str("");
-									in.close();
-									skipRow = true;
-									break;
-								}
-							}
-
-							// If it is the first file show 
-							cout << "Non-matching date stamp " << value << " at line " << row << ".\n";
-							skipRow = true;
-							value = "";
-							break;
-						}
-					}
-
-					// If it is column associated with float values, check that it is valid
-					if (column > 1)
-					{
-						double fVal = stod(value);
-
-						// Check if valid float data
-						if (fVal <= 0.00)
-						{
-							cout << "Invalid floating-point data at line " << row << ".\n";
-							value = "";
-							skipRow = true;
-							break;
-						}
-						// Add the valid float to the record.
-						recordToAdd->addNum(fVal);
-					}
-
-					if (column == 1)
-					{
-						recordToAdd->addString(value);
-						int checkCondition = checkTimeStamp(recordToAdd, drillArray, originalSize);
-						if (checkCondition == -1)
-						{
-							cout << "Duplicate timestamp " << value << " at line " << row << ".\n";
-							skipRow = true;
-							value = "";
-							break;
-						}
-						else if (checkCondition >= 0)
-						{
-							//originalSize--;
-							indexToRemove = checkCondition;
-						}
-					}
-
-					column++; // increment column within row
-					value = ""; // reset value for next value to read in
-				}
-
-				// Add or delete Record/Line
-				if (skipRow != true)
-				{
-					if (indexToRemove >= 0) {
-						drillArray->removeAt(indexToRemove);
-						indexToRemove = -1;
-					}
-					drillArray->add(*recordToAdd);
-					// Increment the amount of valid records added the the array.
-					valid++;
-				}
-				else
-				{
-					// If skipRow is true delete record in memory.
-					delete recordToAdd;
-					recordToAdd = NULL;
-				}
-				// reset boolean value once row Record has been added/deleted.
-				skipRow = false;
+				// Prompt user for subsequent file.
+				filename = "";
+				cout << "Enter data file name: ";
+				getline(cin, filename, '\n');
 			}
-			// if a file is read in this statement will be checked.
-			// If the first file is true. Which means the first file just got read, set first file to false so the 
-			// check for date mismatch of the subsequent files is triggered.
-			if (firstFile)
+			// If there is records, exit the loop
+			else 
 			{
-				firstFile = false;
+				break; // exit loop
 			}
-			// Close the input file stream once complete.
-			in.close();
 		}
-		// Reset original size for the next file to read in.
-		originalSize = drillArray->getSize();
 
 		// Prompt user for subsequent file.
 		filename = "";
 		cout << "Enter data file name: ";
 		getline(cin, filename, '\n');
 	}
-
-	// Create integer array that will be returned and fill in values according to return type specified in function declaration.
-	int* trackedValues = new int[2];
-	trackedValues[0] = rowsRead;
-	trackedValues[1] = valid;
-	return trackedValues;
 }
-*/
+
+// Returns a drilling record populated from the CSV data. nullptr signifies an invalid record.
+DrillingRecord* parseRow(OULinkedList<DrillingRecord>* drillList, string lineOfData, int row)
+{
+	// Create drilling record to populate
+	DrillingRecord* recordToReturn = new DrillingRecord();
+
+	// Create string stream to parse data
+	stringstream dataLine(lineOfData);
+	string value = ""; // Value in the column
+
+	// This loop with parse CSV data and check the validity of the data.
+	// If there is an invalid record, we will return a null value.
+	int column = 0;
+	bool skipRow = false;
+	while (getline(dataLine, value, ',')) 
+	{
+		// Check date stamp validity
+		if (column == 0)
+		{
+			recordToReturn->addString(value);
+			// check that the date in the file matches the list
+			if (!checkDateStamp(recordToReturn, drillList))
+			{
+				if (false)  // When comparing to 2nd Linked List.  //TODO:::::
+				{
+					if (drillList->getFirst().getString(0).compare(value) != 0)
+					{
+						cout << "Date mismatch; file closed.\n";
+						throw Exception();
+					}
+				}
+
+				// Display error message and return null ptr
+				cout << "Non-matching date stamp " << value << " at line " << row << ".\n";
+				delete recordToReturn;
+				recordToReturn = NULL;
+				return nullptr;
+			}
+		}
+
+		if (column == 1) 
+		{
+			recordToReturn->addString(value);
+			if (duplicateTimeStampExists(recordToReturn, drillList)) 
+			{
+				cout << "Duplicate timestamp " << value << " at line " << row << ".\n";
+				delete recordToReturn;
+				recordToReturn = NULL;
+				return nullptr;
+			}
+		}
+
+		if (column > 1) 
+		{
+			double floatVal = stod(value);
+			
+			// Returns a nullptr to be handled in super method.
+			if (isInvalidFloat(floatVal)) 
+			{
+				cout << "Invalid floating-point data at line " << row << ".\n";
+				delete recordToReturn;
+				recordToReturn = NULL;
+				return nullptr;
+			}
+			// Add value to record if valid.
+			recordToReturn->addNum(floatVal);
+		}
+
+		// Reset loop variables.
+		column++;
+		value = "";
+	}
+
+	return recordToReturn;
+}
+
+void readFileStream(OULinkedList<DrillingRecord>* drillList, ifstream& in, int* lineData)
+{
+	// Skip first line in the file.
+	string lineOfData = "";
+	getline(in, lineOfData);
+	lineOfData = "";
+
+	// Track the row of the line of data being parsed.
+	int row = 0;
+
+	// Begin reading the rows of the file specified by the user.
+	while (getline(in, lineOfData)) 
+	{
+		row++; // Increment the row # within the file.
+		lineData[0]++; // Increment the total # of rows read into the file.
+
+		try {
+			// Create drilling record and check if valid.
+			DrillingRecord* recordToAdd = parseRow(drillList, lineOfData, row);
+			
+			if (recordToAdd == nullptr) 
+			{
+				continue;
+			}
+
+			// Insert item into the list based on order.
+			drillList->insert(*recordToAdd);
+			lineData[1]++; // Increment total valid rows.
+		}
+		catch (Exception* exc)
+		{
+			delete exc;
+			exc = NULL;
+
+			// Exception is thrown when date mismatch occurs.
+			in.close();
+			break;
+		}
+	}
+}
 
 // Returns if the date stamps match to the initial date in drill record.
-bool checkDateStamp(DrillingRecord* recordToAdd, ResizableArray<DrillingRecord>* drillArray)
+bool checkDateStamp(DrillingRecord* recordToAdd, OULinkedList<DrillingRecord>* drillList)
 {
 	// Create date stamp comparator
 	DrillingRecordComparator* comparator = new DrillingRecordComparator(0);
 	if (comparator == NULL) throw new ExceptionMemoryNotAvailable;
 
 	// Check if the date stamp is similar to first record or if it is the first record.
-	if (drillArray->getSize() < 1)
+	if (drillList->getSize() < 1)
 	{
 		return true;
 	}
-	else if (comparator->compare(*recordToAdd, drillArray->get(0)) == 0)
+	else if (comparator->compare(*recordToAdd, drillList->getFirst()) == 0)
 	{
 		return true;
 	}
 	return false;
 }
 
-// This method check if duplicate records exist. returns -1,0,1. 
-// '-1' means that a duplicate was found in the file being read in. 
-// 'greter than 0' means a duplicate was found in the old data that needs to be replaced.
-// '-2' means that no duplicate was found and record can be added.
-int checkTimeStamp(DrillingRecord* recordToAdd, ResizableArray<DrillingRecord>* drillArray, long originalSize)
+// Checks if the linked list contains a duplicate timestamp
+bool duplicateTimeStampExists(DrillingRecord* recordToAdd, OULinkedList<DrillingRecord>* drillList)
 {
-	// Create time stamp comparator
-	DrillingRecordComparator* comparator = new DrillingRecordComparator(1);
-	if (comparator == NULL) throw new ExceptionIndexOutOfRange;
+	if (drillList->contains(*recordToAdd)) return true;
+	else return false;
+}
 
-	long long* indexFound = linearSearch(*recordToAdd, *drillArray, *comparator);
-	// This means no duplicate was found at all.
-	if (indexFound[0] < 0)
+bool isInvalidFloat(double value)
+{
+	if (value <= 0.00) 
 	{
-		return -2;
+		return true;
 	}
-	// This means a duplicate was found in the old data AKA replace the old data
-	else if ((long)indexFound[0] <= originalSize - 1L)
-	{
-		return (int)indexFound[0];
-	}
-	// This means a duplicate was found in the new data AKA toss out record
-	else
-	{
-		return -1;
-	}
+	return false;
 }
 
 // Executes a sort on resizable array based on user input.
@@ -439,9 +391,14 @@ void findOption(ResizableArray<DrillingRecord>* drillArray, int sortedColumn)
 }
 
 //Method that allows the user to either output data to a specified location, sort by different keys, or find a records.
-void dataManipulationLoop(ResizableArray<DrillingRecord>* drillArray, int* fileData)
+void dataManipulationLoop(OULinkedList<DrillingRecord>* drillList, int* fileData)
 {
 	int sortedColumn = -1;
+
+	ResizableArray<DrillingRecord>* drillArray = new ResizableArray<DrillingRecord>;
+	if (drillArray == NULL) throw new ExceptionMemoryNotAvailable();
+
+	//TODO:: Copy list into array
 
 	// Prompt user and get initial input
 	cout << "Enter (o)utput, (s)ort, (f)ind, or (q)uit: \n";
@@ -456,33 +413,30 @@ void dataManipulationLoop(ResizableArray<DrillingRecord>* drillArray, int* fileD
 		{
 		case 'o':
 			// Execute drillerOuput and display data then terminate loop.
-			drillerOutput(drillArray, fileData);
-
-			// Prompt and get input for next data manipulation loop
-			cout << "Enter (o)utput, (s)ort, (f)ind, or (q)uit: \n";
-			userinput = "";
-			getline(cin, userinput, '\n');
+			drillerOutput(drillList, fileData);
 			break;
 		case 's':
 			sortedColumn = sortOption(drillArray);
-			// Prompt and get input for next data manipulation loop
-			cout << "Enter (o)utput, (s)ort, (f)ind, or (q)uit: \n";
-			userinput = "";
-			getline(cin, userinput, '\n');
 			break;
 		case 'f':
 			findOption(drillArray, sortedColumn);
-			// Prompt and get input for next data manipulation loop
-			cout << "Enter (o)utput, (s)ort, (f)ind, or (q)uit: \n";
-			userinput = "";
-			getline(cin, userinput, '\n');
+			break;
+		case 'm':
+			break;
+		case 'p':
+			break;
+		case 'r':
 			break;
 		}
+		// Prompt and get input for next data manipulation loop
+		cout << "Enter (o)utput, (s)ort, (f)ind, (m)erge, (p)urge, (r)ecords, or (q)uit: \n";
+		userinput = "";
+		getline(cin, userinput, '\n');
 	}
 }
 
 //Ouput to location specified by user.
-void drillerOutput(ResizableArray<DrillingRecord>* drillArray, int* fileData)
+void drillerOutput(OULinkedList<DrillingRecord>* drillList, int* fileData)
 {
 	// Get initial user input about where to output data.
 	cout << "Enter output file name: ";
@@ -501,16 +455,17 @@ void drillerOutput(ResizableArray<DrillingRecord>* drillArray, int* fileData)
 		{
 			continueInput = false;
 
+			//TODO:::::::
 			//Out put records in memory
-			for (unsigned long index = 0; index < drillArray->getSize(); index++)
+		/*	for (unsigned long index = 0; index < drillList->getSize(); index++)
 			{
 				cout << drillArray->get(index) << "\n";
-			}
+			}*/
 
 			// Output record statistics from getFilesFromUser.
 			cout << "Data lines read: " << fileData[0] << "; ";
 			cout << "Valid drilling records read: " << fileData[1] << "; ";
-			cout << "Drilling records in memory: " << drillArray->getSize() << "\n";
+			cout << "Drilling records in memory: " << drillList->getSize() << "\n";
 		}
 		// If input is a file name check that it exists and contiue with output
 		else
@@ -529,15 +484,16 @@ void drillerOutput(ResizableArray<DrillingRecord>* drillArray, int* fileData)
 				// File exists so continue output to file.
 				continueInput = false;
 
-				for (unsigned long index = 0; index < drillArray->getSize(); index++)
+			/*	// TODO:::::
+				for (unsigned long index = 0; index < drillList->getSize(); index++)
 				{
-					myFile << drillArray->get(index) << "\n";
-				}
+					myFile << drillList->get(index) << "\n";
+				}*/
 
 				// Display record statistics from file read.
 				myFile << "Data lines read: " << fileData[0] << "; ";
 				myFile << "Valid drilling records read: " << fileData[1] << "; ";
-				myFile << "Drilling records in memory: " << drillArray->getSize() << "\n";
+				myFile << "Drilling records in memory: " << drillList->getSize() << "\n";
 
 				// Closing resource.
 				myFile.close();
@@ -546,9 +502,10 @@ void drillerOutput(ResizableArray<DrillingRecord>* drillArray, int* fileData)
 	}
 }
 
-// TODO: 
-// 1) binary search returns first in cluster. --- completed
-// 2) linear search returns first in cluster. 
-// 3) Track if column is sorted in search/find.
-// 4) if sorted by correct column, search with binary else search with linear.
-// 5) track down duplicate time stamp error.
+/*
+1. drillerOutput still uses resizable array.
+2. figure out where to use linked list
+3. finish merge
+4. finish purge
+5. finish records
+*/

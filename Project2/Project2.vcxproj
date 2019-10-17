@@ -171,6 +171,9 @@
     <ClInclude Include="Sorter.h" />
     <ClInclude Include="TestComparator.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\..\Desktop\RPT.csv" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
